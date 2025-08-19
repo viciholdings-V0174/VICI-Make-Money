@@ -392,12 +392,18 @@ function drawResult() {
   ctx.font = '36px Arial';
   ctx.fillText('分數：$' + score, canvas.width / 2, canvas.height / 2);
   ctx.font = '32px Arial';
-  if (score > 50) {
-    ctx.fillStyle = '#1a9c36';
-    ctx.fillText('威旭資訊賺大錢', canvas.width / 2, canvas.height / 2 + 60);
-  } else {
+  if (score < 31) {
     ctx.fillStyle = '#c00';
-    ctx.fillText('業績未達標，請再接再厲', canvas.width / 2, canvas.height / 2 + 60);
+    ctx.fillText('公司倒閉', canvas.width / 2, canvas.height / 2 + 60);
+  } else if (score < 51) {
+    ctx.fillStyle = '#c00';
+    ctx.fillText('再接再厲', canvas.width / 2, canvas.height / 2 + 60);
+  } else if (score < 81) {
+    ctx.fillStyle = '#1a9c36';
+    ctx.fillText('進軍國際', canvas.width / 2, canvas.height / 2 + 60);
+  } else {
+    ctx.fillStyle = '#1a9c36';
+    ctx.fillText('威旭賺大錢', canvas.width / 2, canvas.height / 2 + 60);
   }
   ctx.textAlign = 'left';
   ctx.restore();
