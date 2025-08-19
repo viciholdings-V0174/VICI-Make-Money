@@ -58,7 +58,7 @@ setInterval(() => {
 let score = 0;
 let mouse = { x: canvas.width / 2, y: canvas.height / 2 };
 
-canvas.addEventListener('mousemove', function(e) {
+canvas.addEventListener('pointermove', function(e) {
   const rect = canvas.getBoundingClientRect();
   mouse.x = e.clientX - rect.left;
   mouse.y = e.clientY - rect.top;
