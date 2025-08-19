@@ -59,10 +59,11 @@ let score = 0;
 let mouse = { x: canvas.width / 2, y: canvas.height / 2 };
 
 canvas.addEventListener('pointermove', function(e) {
+  e.preventDefault(); // 防止頁面滾動
   const rect = canvas.getBoundingClientRect();
   mouse.x = e.clientX - rect.left;
   mouse.y = e.clientY - rect.top;
-});
+}, { passive: false });
 
 function worldToScreen(wx, wy) {
   // 以 whale 為中心，轉換世界座標到畫布座標
