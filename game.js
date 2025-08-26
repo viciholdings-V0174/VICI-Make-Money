@@ -102,7 +102,33 @@ function drawWhale() {
   whale.width = size * 1.5;
   whale.height = size;
   const pos = worldToScreen(whale.x, whale.y);
-  ctx.drawImage(whaleImg, pos.x - whale.width / 2, pos.y - whale.height / 2, whale.width, whale.height);
+
+  // 判斷滑鼠在鯨魚左邊還是右邊
+  const center = { x: canvas.width / 2, y: canvas.height / 2 };
+  const isMouseLeft = mouse.x < center.x;
+
+  // 計算角度
+  let angle = 0;
+  if (whale.dx !== 0 || whale.dy !== 0) {
+    angle = Math.atan2(whale.dy, whale.dx);
+  }
+
+  ctx.save();
+  ctx.translate(pos.x, pos.y);
+  if (isMouseLeft) {
+    ctx.scale(-1, 1); // 水平翻轉
+    ctx.rotate(-angle + Math.PI); // 反向旋轉
+  } else {
+    ctx.rotate(angle);
+  }
+  ctx.drawImage(
+    whaleImg,
+    -whale.width / 2,
+    -whale.height / 2,
+    whale.width,
+    whale.height
+  );
+  ctx.restore();
 }
 
 function drawCoin() {
