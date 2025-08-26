@@ -99,7 +99,8 @@ function drawWhale() {
   const baseSize = 80;
   const minSize = 20;
   const size = Math.max(minSize, baseSize + score * 2);
-  whale.width = whale.height = size;
+  whale.width = size * 1.5;
+  whale.height = size;
   const pos = worldToScreen(whale.x, whale.y);
   ctx.drawImage(whaleImg, pos.x - whale.width / 2, pos.y - whale.height / 2, whale.width, whale.height);
 }
