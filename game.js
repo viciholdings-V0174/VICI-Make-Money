@@ -393,17 +393,9 @@ function detectCollision() {
   }
 }
 
-let gameTime = 40; // 秒
+let gameTime = 40; /* seconds */
 let gameOver = false;
-let timerInterval = setInterval(() => {
-  if (!gameOver) {
-    gameTime--;
-    if (gameTime <= 0) {
-      gameOver = true;
-      clearInterval(timerInterval);
-    }
-  }
-}, 1000);
+let timerInterval = null;
 
 function drawTimer() {
   ctx.font = '24px Arial';
@@ -441,8 +433,38 @@ function drawResult() {
   ctx.restore();
 }
 
+let gameStarted = false;
+
+const startBtn = document.getElementById('startBtn');
+
+/* Start game after hit button */
+startBtn.addEventListener('click', () => {
+  gameStarted = true;
+  startBtn.style.display = 'none';
+
+  /* Reset timer */
+  gameTime = 40;
+  gameOver = false;
+  timerInterval = setInterval(() => {
+    if (!gameOver) {
+      gameTime--;
+      if (gameTime <= 0) {
+        gameOver = true;
+        clearInterval(timerInterval);
+      }
+    }
+  }, 1000);
+
+  whaleImg.onload(); // 啟動遊戲循環
+});
+
+// 修改 gameLoop 啟動方式
+// 不要自動啟動 gameLoop，改由按鈕觸發
+// whaleImg.onload = () => { ... } 保持不變
+
+// 修改 update 和 draw，遊戲未開始時只顯示背景和鯨魚
 function update() {
-  if (gameOver) return;
+  if (!gameStarted || gameOver) return;
   // 滑鼠控制：計算目標方向
   const center = { x: canvas.width / 2, y: canvas.height / 2 };
   const dx = mouse.x - center.x;
@@ -463,15 +485,17 @@ function update() {
 
 function draw() {
   drawBackground();
-  drawCoin();
-  drawBomb();
-  drawAdam();
-  drawHank();
   drawWhale();
-  drawScore();
-  drawTimer();
-  if (gameOver) {
-    drawResult();
+  if (gameStarted) {
+    drawCoin();
+    drawBomb();
+    drawAdam();
+    drawHank();
+    drawScore();
+    drawTimer();
+    if (gameOver) {
+      drawResult();
+    }
   }
 }
 
