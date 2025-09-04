@@ -184,7 +184,7 @@ function newCoinPosition(nearX, nearY) {
 
 // adam 設定
 const adamImg = new Image();
-adamImg.src = 'images/adam.png';
+adamImg.src = 'images/Adam-icon.png';
 let adams = [];
 
 function randomCorner(centerX, centerY, distance = 0) {
@@ -255,7 +255,7 @@ function scatterCoins(centerX, centerY, count, blink = false) {
 
 // hank 設定
 const hankImg = new Image();
-hankImg.src = 'images/hank.png';
+hankImg.src = 'images/Hank-icon.png';
 let hanks = [];
 
 function spawnHank(centerX, centerY) {
@@ -263,8 +263,8 @@ function spawnHank(centerX, centerY) {
   hanks.push({
     x: pos.x,
     y: pos.y,
-    width: 60 * 0.6,
-    height: 60 * 0.6,
+    width: 60,
+    height: 60,
     speed: whale.speed * 0.3
   });
 }
