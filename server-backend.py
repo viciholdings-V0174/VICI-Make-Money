@@ -10,7 +10,7 @@ scoreboard = []
 clients = set()
 
 app = FastAPI()
-app.mount("/VICI-Make-Money", StaticFiles(directory="web", html=True), name="VICI-Make-Money")
+app.mount("/VICI-Make-Money", StaticFiles(directory="docs", html=True), name="VICI-Make-Money")
 
 @app.get("/")
 async def index():
