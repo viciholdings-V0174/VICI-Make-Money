@@ -603,7 +603,6 @@ function showStartScreen() {
   rankingBoard.style.display = 'block';
   fetchAndShowRanking();
   hideUploadBox();
-  // showWhaleIcon(); // 移除這行
 }
 
 // 開始遊戲時隱藏鯨魚圖案
@@ -731,7 +730,12 @@ function hideRanking() {
 }
 
 function fetchAndShowRanking() {
-  ws.send(JSON.stringify({ action: 'get_rankings' }));
+  if (ws && ws.readyState === WebSocket.OPEN) {
+    ws.send(JSON.stringify({ action: 'get_rankings' }));
+  } else {
+    // WS 未連線也能繼續顯示起始畫面
+    console.warn("WebSocket 尚未連線，無法取得排行榜");
+  }
 }
 
 const backHomeBtn = document.getElementById('backHomeBtn');
