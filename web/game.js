@@ -23,10 +23,6 @@ const coinImgs = [
   return img;
 });
 
-// 載入背景圖
-const bgImg = new Image();
-bgImg.src = 'images/Charging_Bull_statue.jpg';
-
 // 地圖格線設定
 const GRID_SIZE = 100;
 
@@ -517,7 +513,7 @@ const rankingList = document.getElementById('rankingList');
 // WebSocket 連線
 let ws = null;
 function connectWS() {
-  ws = new WebSocket('ws://34.80.60.108:9001');
+  ws = new WebSocket(`ws://${window.location.hostname}:80/ws`);
   ws.onopen = function() {
     showStartScreen(); // 連線成功後才顯示起始場景
   };
@@ -558,6 +554,7 @@ function showRanking(rankings) {
   list.appendChild(header);
 
   // 前10名
+  console.log('排行榜資料', rankings);
   for (let i = 0; i < 10; i++) {
     const li = document.createElement('li');
     li.style.display = 'flex';
@@ -566,14 +563,14 @@ function showRanking(rankings) {
     li.style.fontSize = '1.1em';
     li.innerHTML = `<span style="width:2.5em;text-align:right;">${i + 1}.</span>`;
     if (rankings[i]) {
-      const [username, score] = rankings[i];
+      const username = rankings[i].username;
+      const score = rankings[i].score;
       li.innerHTML += `<span style="flex:1;text-align:left;padding-left:24px;">${username}</span><span style="flex:1;text-align:right;">$${score}</span>`;
     } else {
       li.innerHTML += `<span style="flex:1;text-align:left;padding-left:24px;">&nbsp;</span><span style="flex:1;text-align:right;">&nbsp;</span>`;
     }
     list.appendChild(li);
   }
-  console.log('排行榜資料', rankings);
 }
 
 // 顯示鯨魚圖案在排行榜和開始按鈕之間

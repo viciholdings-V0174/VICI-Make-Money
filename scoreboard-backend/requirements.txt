@@ -1,5 +1,0 @@
-websocket-server
-flask
-flask-socketio
-eventlet
-jsonschema
