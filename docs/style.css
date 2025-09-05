@@ -94,6 +94,6 @@ canvas {
   list-style-type: none; /* 新增這行，移除自動點點 */
 }
 
-input, textarea, select, button {
-  font-size:16px; /* 避免 iOS Safari 放大 */
+#usernameInput {
+  font-size: 18px;
 }
