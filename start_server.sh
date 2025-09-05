@@ -4,7 +4,7 @@
 source venv/bin/activate
 
 # 啟動程式並將輸出寫入 log
-nohup python server-backend.py > scoreboard.log 2>&1 &
+nohup python -u server-backend.py > scoreboard.log 2>&1 &
 
 # 儲存 PID
 echo $! > scoreboard.pid
