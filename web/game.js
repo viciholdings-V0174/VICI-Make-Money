@@ -513,7 +513,7 @@ const rankingList = document.getElementById('rankingList');
 // WebSocket 連線
 let ws = null;
 function connectWS() {
-  ws = new WebSocket(`ws://${window.location.hostname}:80/ws`);
+  ws = new WebSocket(`ws://${window.location.hostname}:8000/ws`);
   ws.onopen = function() {
     showStartScreen(); // 連線成功後才顯示起始場景
   };

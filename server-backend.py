@@ -49,6 +49,6 @@ async def websocket_endpoint(ws: WebSocket):
 
 if __name__ == "__main__":
     config = Config()
-    config.bind = ["0.0.0.0:80"]
+    config.bind = ["0.0.0.0:8000"]
     loop = asyncio.get_event_loop()
     loop.run_until_complete(serve(app, config))
