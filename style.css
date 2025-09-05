@@ -17,10 +17,10 @@ canvas {
 }
 
 #startBtn {
-  position: fixed;
-  top: 50%;
+  position: absolute;
   left: 50%;
-  transform: translate(-50%, -50%);
+  top: 72%;
+  transform: translate(-50%, 0);
   background: #1976d2;
   color: #fff;
   font-size: 2em;
@@ -38,4 +38,58 @@ canvas {
 
 #startBtn:hover {
   background: #1565c0;
+}
+
+#gameCanvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+}
+
+#scoreUpload {
+  position: absolute;
+  left: 50%;
+  top: 68%;         /* 往下移動，原本大多是 50% */
+  transform: translate(-50%, 0);
+  z-index: 20;
+  background: rgba(255,255,255,0.97);
+  padding: 20px 32px 20px 32px;
+  border-radius: 12px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  text-align: center;
+  min-width: 260px;
+  margin-top: 24px; /* 與上方結算資訊留間隔 */
+}
+
+#scoreUpload button {
+  margin: 0 8px 0 0;
+}
+
+#rankingBoard {
+  position: absolute;
+  left: 50%;
+  top: 12%;
+  transform: translate(-50%, 0);
+  z-index: 10;
+  width: 400px;
+  max-width: 90vw;
+  background: rgba(255,255,255,0.97);
+  padding: 32px 32px 16px 32px;
+  border-radius: 16px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  text-align: center;
+}
+
+#rankingBoard h3 {
+  margin-top: 0;
+  margin-bottom: 16px;
+  font-size: 2em;
+}
+
+#rankingList {
+  font-size: 1.3em;
+  padding-left: 0;
+  margin: 0;
+  list-style-type: none; /* 新增這行，移除自動點點 */
 }

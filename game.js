@@ -403,36 +403,6 @@ function drawTimer() {
   ctx.fillText('Time: ' + gameTime, canvas.width - 140, 40);
 }
 
-function drawResult() {
-  ctx.save();
-  ctx.globalAlpha = 0.85;
-  ctx.fillStyle = '#fff';
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-  ctx.globalAlpha = 1;
-  ctx.font = 'bold 48px Arial';
-  ctx.fillStyle = '#222';
-  ctx.textAlign = 'center';
-  ctx.fillText('遊戲結束', canvas.width / 2, canvas.height / 2 - 60);
-  ctx.font = '36px Arial';
-  ctx.fillText('分數：$' + score, canvas.width / 2, canvas.height / 2);
-  ctx.font = '32px Arial';
-  if (score < 31) {
-    ctx.fillStyle = '#c00';
-    ctx.fillText('公司倒閉', canvas.width / 2, canvas.height / 2 + 60);
-  } else if (score < 51) {
-    ctx.fillStyle = '#c00';
-    ctx.fillText('再接再厲', canvas.width / 2, canvas.height / 2 + 60);
-  } else if (score < 81) {
-    ctx.fillStyle = '#1a9c36';
-    ctx.fillText('進軍國際', canvas.width / 2, canvas.height / 2 + 60);
-  } else {
-    ctx.fillStyle = '#1a9c36';
-    ctx.fillText('威旭賺大錢', canvas.width / 2, canvas.height / 2 + 60);
-  }
-  ctx.textAlign = 'left';
-  ctx.restore();
-}
-
 let gameStarted = false;
 
 const startBtn = document.getElementById('startBtn');
@@ -441,6 +411,22 @@ const startBtn = document.getElementById('startBtn');
 startBtn.addEventListener('click', () => {
   gameStarted = true;
   startBtn.style.display = 'none';
+  hideRanking();
+  hideUploadBox();
+  hideWhaleIcon();
+  score = 0; // 重設分數
+
+  // 清除舊有場景道具物件
+  coins = generateCoins(whale.x, whale.y);
+  adams = [];
+  hanks = [];
+  bombs = generateBombs(whale.x, whale.y);
+
+  // 修正：開始前先清除舊的 interval
+  if (timerInterval) {
+    clearInterval(timerInterval);
+    timerInterval = null;
+  }
 
   /* Reset timer */
   gameTime = 40;
@@ -455,7 +441,6 @@ startBtn.addEventListener('click', () => {
     }
   }, 1000);
 
-  whaleImg.onload(); // 啟動遊戲循環
 });
 
 // 修改 gameLoop 啟動方式
@@ -505,17 +490,260 @@ function gameLoop() {
   requestAnimationFrame(gameLoop);
 }
 
-// 移除鍵盤事件與相關函式
-
+let gameLoopStarted = false;
 whaleImg.onload = () => {
-  // 確保所有 coin 圖片都載入
-  let loaded = 0;
-  coinImgs.forEach(img => {
-    img.onload = () => {
-      loaded++;
-      if (loaded === coinImgs.length) {
-        gameLoop();
-      }
-    };
-  });
+  if (!gameLoopStarted) {
+    gameLoopStarted = true;
+    // 確保所有 coin 圖片都載入
+    let loaded = 0;
+    coinImgs.forEach(img => {
+      img.onload = () => {
+        loaded++;
+        if (loaded === coinImgs.length) {
+          gameLoop();
+        }
+      };
+    });
+  }
 };
+
+// 新增 DOM 元素取得
+const scoreUpload = document.getElementById('scoreUpload');
+const usernameInput = document.getElementById('usernameInput');
+const uploadBtn = document.getElementById('uploadBtn');
+const rankingBoard = document.getElementById('rankingBoard');
+const rankingList = document.getElementById('rankingList');
+
+// WebSocket 連線
+let ws = null;
+function connectWS() {
+  ws = new WebSocket('ws://34.80.60.108:9001');
+  ws.onopen = function() {
+    showStartScreen(); // 連線成功後才顯示起始場景
+  };
+  ws.onmessage = function(event) {
+    const data = JSON.parse(event.data);
+    if (data.rankings) {
+      showRanking(data.rankings);
+    }
+  };
+}
+connectWS();
+
+// 顯示/隱藏上傳框
+function showUploadBox() {
+  scoreUpload.style.display = 'block';
+}
+function hideUploadBox() {
+  scoreUpload.style.display = 'none';
+}
+
+// 顯示/隱藏排行榜
+function showRanking(rankings) {
+  const board = document.getElementById('rankingBoard');
+  const list = document.getElementById('rankingList');
+  list.innerHTML = '';
+
+  // 欄位標題
+  const header = document.createElement('li');
+  header.style.display = 'flex';
+  header.style.justifyContent = 'space-between';
+  header.style.fontWeight = 'bold';
+  header.style.fontSize = '1.1em';
+  header.innerHTML = `
+    <span style="width:2.5em;text-align:right;">名次</span>
+    <span style="flex:1;text-align:left;padding-left:24px;">玩家名稱</span>
+    <span style="flex:1;text-align:right;">分數</span>
+  `;
+  list.appendChild(header);
+
+  // 前10名
+  for (let i = 0; i < 10; i++) {
+    const li = document.createElement('li');
+    li.style.display = 'flex';
+    li.style.justifyContent = 'space-between';
+    li.style.padding = '4px 0';
+    li.style.fontSize = '1.1em';
+    li.innerHTML = `<span style="width:2.5em;text-align:right;">${i + 1}.</span>`;
+    if (rankings[i]) {
+      const [username, score] = rankings[i];
+      li.innerHTML += `<span style="flex:1;text-align:left;padding-left:24px;">${username}</span><span style="flex:1;text-align:right;">$${score}</span>`;
+    } else {
+      li.innerHTML += `<span style="flex:1;text-align:left;padding-left:24px;">&nbsp;</span><span style="flex:1;text-align:right;">&nbsp;</span>`;
+    }
+    list.appendChild(li);
+  }
+  console.log('排行榜資料', rankings);
+}
+
+// 顯示鯨魚圖案在排行榜和開始按鈕之間
+function showWhaleIcon() {
+  let whaleIcon = document.getElementById('whaleIcon');
+  if (!whaleIcon) {
+    whaleIcon = document.createElement('img');
+    whaleIcon.id = 'whaleIcon';
+    whaleIcon.src = 'images/whale.png';
+    whaleIcon.style.position = 'absolute';
+    whaleIcon.style.left = '50%';
+    whaleIcon.style.top = '38%';
+    whaleIcon.style.transform = 'translate(-50%, 0)';
+    whaleIcon.style.width = '120px';
+    whaleIcon.style.height = '120px';
+    whaleIcon.style.zIndex = '10';
+    document.body.appendChild(whaleIcon);
+  }
+  whaleIcon.style.display = 'block';
+}
+
+function hideWhaleIcon() {
+  const whaleIcon = document.getElementById('whaleIcon');
+  if (whaleIcon) whaleIcon.style.display = 'none';
+}
+
+// 起始場景顯示
+function showStartScreen() {
+  startBtn.style.display = 'block';
+  rankingBoard.style.display = 'block';
+  fetchAndShowRanking();
+  hideUploadBox();
+  // showWhaleIcon(); // 移除這行
+}
+
+// 開始遊戲時隱藏鯨魚圖案
+startBtn.addEventListener('click', () => {
+  gameStarted = true;
+  startBtn.style.display = 'none';
+  hideRanking();
+  hideUploadBox();
+  hideWhaleIcon();
+  score = 0; // 重設分數
+
+  // 清除舊有場景道具物件
+  coins = generateCoins(whale.x, whale.y);
+  adams = [];
+  hanks = [];
+  bombs = generateBombs(whale.x, whale.y);
+
+  // 修正：開始前先清除舊的 interval
+  if (timerInterval) {
+    clearInterval(timerInterval);
+    timerInterval = null;
+  }
+
+  /* Reset timer */
+  gameTime = 40;
+  gameOver = false;
+  timerInterval = setInterval(() => {
+    if (!gameOver) {
+      gameTime--;
+      if (gameTime <= 0) {
+        gameOver = true;
+        clearInterval(timerInterval);
+      }
+    }
+  }, 1000);
+
+  // whaleImg.onload(); // 不需重複啟動 gameLoop
+});
+
+// 上傳分數後回到起始場景
+if (uploadBtn) {
+  uploadBtn.onclick = function() {
+    const username = usernameInput.value.trim();
+    if (!username) {
+      alert('請輸入名稱');
+      return;
+    }
+    if (username.length > 16) {
+      alert('名稱最多 16 字元');
+      return;
+    }
+    // 設定一次性回應監聽
+    ws._uploadScoreHandler = function(event) {
+      const data = JSON.parse(event.data);
+      if (data.status === "exists") {
+        alert("ID已存在，請換一個名稱！");
+        // 重新顯示上傳框
+        showUploadBox();
+      } else if (data.status === "success") {
+        hideUploadBox();
+        ws.removeEventListener('message', ws._uploadScoreHandler);
+        // 查詢排行並回首頁
+        ws.send(JSON.stringify({ action: 'get_rankings' }));
+        gameStarted = false;
+        gameOver = false;
+        showStartScreen();
+      }
+      // 只處理一次
+      ws.removeEventListener('message', ws._uploadScoreHandler);
+    };
+    ws.addEventListener('message', ws._uploadScoreHandler);
+
+    ws.send(JSON.stringify({
+      action: 'upload_score',
+      username,
+      score
+    }));
+    hideUploadBox();
+  };
+}
+
+// drawResult 不變，結束時只顯示上傳框
+function drawResult() {
+  ctx.save();
+  ctx.globalAlpha = 0.85;
+  ctx.fillStyle = '#fff';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.globalAlpha = 1;
+  ctx.font = 'bold 48px Arial';
+  ctx.fillStyle = '#222';
+  ctx.textAlign = 'center';
+  ctx.fillText('遊戲結束', canvas.width / 2, canvas.height / 2 - 60);
+  ctx.font = '36px Arial';
+  ctx.fillText('分數：$' + score, canvas.width / 2, canvas.height / 2);
+  ctx.font = '32px Arial';
+  if (score < 31) {
+    ctx.fillStyle = '#c00';
+    ctx.fillText('試用期未通過', canvas.width / 2, canvas.height / 2 + 60);
+  } else if (score < 51) {
+    ctx.fillStyle = '#c00';
+    ctx.fillText('再接再厲', canvas.width / 2, canvas.height / 2 + 60);
+  } else if (score < 81) {
+    ctx.fillStyle = '#1a9c36';
+    ctx.fillText('進軍國際', canvas.width / 2, canvas.height / 2 + 60);
+  } else {
+    ctx.fillStyle = '#1a9c36';
+    ctx.fillText('威旭賺大錢', canvas.width / 2, canvas.height / 2 + 60);
+  }
+  ctx.textAlign = 'left';
+  ctx.restore();
+
+  // 顯示名稱輸入與上傳分數
+  showUploadBox();
+  hideRanking();
+}
+
+// 重新開始遊戲時隱藏上傳框與排行
+startBtn.addEventListener('click', () => {
+  hideUploadBox();
+  hideRanking();
+});
+
+function hideRanking() {
+  rankingBoard.style.display = 'none';
+}
+
+function fetchAndShowRanking() {
+  ws.send(JSON.stringify({ action: 'get_rankings' }));
+}
+
+const backHomeBtn = document.getElementById('backHomeBtn');
+
+if (backHomeBtn) {
+  backHomeBtn.onclick = function() {
+    hideUploadBox();
+    gameStarted = false;
+    gameOver = false;
+    showStartScreen();
+  };
+}
