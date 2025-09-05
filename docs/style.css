@@ -94,11 +94,6 @@ canvas {
   list-style-type: none; /* 新增這行，移除自動點點 */
 }
 
-html, body, canvas {
-  touch-action: none;
-  overscroll-behavior: none;
-}
-
-input, button {
-  font-size: 16px;
+input, textarea, select, button {
+  font-size:16px; /* 避免 iOS Safari 放大 */
 }
