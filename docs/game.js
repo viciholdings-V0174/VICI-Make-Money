@@ -524,7 +524,6 @@ function connectWS() {
     }
   };
 }
-connectWS();
 
 // 顯示/隱藏上傳框
 function showUploadBox() {
@@ -748,3 +747,5 @@ if (backHomeBtn) {
     showStartScreen();
   };
 }
+
+connectWS();
